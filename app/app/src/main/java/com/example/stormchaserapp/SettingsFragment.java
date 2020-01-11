@@ -1,7 +1,9 @@
 package com.example.stormchaserapp;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,26 +13,43 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RadioButton;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends AppCompatActivity {
 
-    private SettingsViewModel mViewModel;
-
-    public static SettingsFragment newInstance() {
-        return new SettingsFragment();
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.settings_fragment, container, false);
-    }
+    private RadioButton NL;
+    private RadioButton EN;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
-        // TODO: Use the ViewModel
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.settings_fragment);
+
+        Button backButton = findViewById(R.id.buttonMap);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchMap();
+            }
+        });
+
+        NL = findViewById(R.id.radioButtonNL);
+        EN = findViewById(R.id.radioButtonEN);
+        NL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
+        EN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            }
+        });
     }
 
+    public void launchMap() {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
 }
