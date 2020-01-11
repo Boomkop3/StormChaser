@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">StormChaserApp</string>
+    <string name="desc">testing</string>
+    <string name="start">start</string>
+    <string name="map">map</string>
+    <string name="stormchaser">stormchaser</string>
+    <string name="settings">settings</string>
+    <string name="language">language:</string>
+    <string name="nl">Dutch</string>
+    <string name="en">English</string>
+</resources>
