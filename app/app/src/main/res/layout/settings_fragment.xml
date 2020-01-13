@@ -8,16 +8,30 @@
     android:background="@android:color/darker_gray"
     tools:context=".SettingsFragment">
 
-    <RadioButton
-        android:id="@+id/radioButtonNL"
+    <RadioGroup
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/nl"
-        android:textSize="36sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLang" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewLang">
+
+        <RadioButton
+            android:id="@+id/radioButtonEN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/en"
+            android:textSize="36sp" />
+
+        <RadioButton
+            android:id="@+id/radioButtonNL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/nl"
+            android:textSize="36sp" />
+    </RadioGroup>
 
     <TextView
         android:id="@+id/textViewLang"
@@ -30,17 +44,6 @@
         android:textSize="36sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonMap" />
-
-    <RadioButton
-        android:id="@+id/radioButtonEN"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/en"
-        android:textSize="36sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/radioButtonNL" />
 
     <Button
         android:id="@+id/buttonMap"
