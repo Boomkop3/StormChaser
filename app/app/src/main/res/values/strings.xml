@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">StormChaserApp</string>
     <string name="stormchaser">stormchaser</string>
-    <string name="desc">testen</string>
+    <string name="desc">Op zoek naar een regenachtig dorp of stad? Dan is deze app voor jou!</string>
     <string name="start">start</string>
     <string name="map">kaart</string>
     <string name="settings">instellingen</string>
@@ -11,4 +11,5 @@
     <string name="title_activity_maps" translatable="false">Map</string>
     <string name="location_required_dialog_title">Locatie vereist</string>
     <string name="location_required_dialog_message">Zet je gps aan</string>
+    <string name="developers">Ontwikkelaars</string>
 </resources>
