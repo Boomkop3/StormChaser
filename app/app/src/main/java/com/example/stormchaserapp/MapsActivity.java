@@ -18,6 +18,7 @@ import com.example.stormchaserapp.API.LocationApiManager;
 import com.example.stormchaserapp.API.NearbyCitiesApiManager;
 import com.example.stormchaserapp.API.OnNewNearbyCity;
 import com.example.stormchaserapp.Models.LocalWeather;
+import com.example.stormchaserapp.Storage.VolatileStorage;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,7 +39,6 @@ public class MapsActivity
     private GoogleMap map;
     private LocationApiManager locationApiManager;
     private Context context;
-    private boolean gotWeatherInfo;
 
     public void startSettings() {
         Intent intent = new Intent(this, SettingsFragment.class);
@@ -48,7 +48,6 @@ public class MapsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.gotWeatherInfo = false;
         this.context = getApplicationContext();
         this.locationApiManager = LocationApiManager.with(context);
         setContentView(R.layout.activity_maps);
@@ -68,6 +67,12 @@ public class MapsActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        // After a screen rotation, reload all markers
+        if (VolatileStorage.getInstance().isGotWeatherInfo()){
+            for (LocalWeather city : VolatileStorage.getInstance().getLoadedCities()){
+                loadCity(city);
+            }
+        }
         // Start the map using lastKnownLocation from fusedLocation
         // Then switch to gps as soon as it's available
         if (locationApiManager.checkLocationPermission()){
@@ -91,6 +96,26 @@ public class MapsActivity
         }
     }
 
+    private void handleNewCity(LocalWeather city){
+        VolatileStorage.getInstance().getLoadedCities().add(city);
+        loadCity(city);
+    }
+
+    private void loadCity(LocalWeather city){
+        // ToDo: print a rainy cloud icon or something
+        // Todo: generate directional geofences
+        //  to check if the user walks in the right direction
+        if (city.isRaining()){
+            MarkerOptions rainMarker = new MarkerOptions();
+            rainMarker.position(city.getLocation());
+            rainMarker.title(city.getWeatherDescription());
+            map.addMarker(rainMarker);
+        }
+        else {
+
+        }
+    }
+
     private void handleLocationUpdate(Location location){
         LatLng locationPoint = new LatLng(
                 location.getLatitude(),
@@ -108,28 +133,18 @@ public class MapsActivity
                         10
                 )
         );
-        if (!this.gotWeatherInfo){
-            this.gotWeatherInfo = true;
+        if (!VolatileStorage.getInstance().isGotWeatherInfo()){
+            VolatileStorage.getInstance().setGotWeatherInfo(true);
             try {
                 NearbyCitiesApiManager
                         .with(this)
                         .getNearbyCities(
                                 locationPoint,
                                 new OnNewNearbyCity() {
+
                                     @Override
                                     public void newCity(LocalWeather city) {
-                                        // ToDo: print a rainy cloud icon or something
-                                        // Todo: generate directional geofences
-                                        //  to check if the user walks in the right direction
-                                        if (city.isRaining()){
-                                            MarkerOptions rainMarker = new MarkerOptions();
-                                            rainMarker.position(city.getLocation());
-                                            rainMarker.title(city.getWeatherDescription());
-                                            map.addMarker(rainMarker);
-                                        }
-                                        else {
-
-                                        }
+                                        handleNewCity(city);
                                     }
                                 });
             } catch (UnsupportedEncodingException e) {
