@@ -8,10 +8,12 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -67,15 +69,13 @@ public class LocationApiManager {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     public void getBackgroundLocPermission(Activity activity) {
         if (!checkBackgroundLocPermission()) {
-            ActivityCompat.requestPermissions(
-                    activity,
-                    new String[] {
-                            Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                    },
-                    6
-            );
+            ActivityCompat.requestPermissions(activity, new String[] {
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            }, 6);
         }
     }
     public boolean checkLocationPermission(){
@@ -86,11 +86,14 @@ public class LocationApiManager {
     }
 
     public boolean checkBackgroundLocPermission() {
-        return ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED;
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            }
+        }
+        return false;
     }
+
 
     public void startListeningUserLocation(LocationListener locationListener) {
         Criteria locationCriteria = new Criteria();
