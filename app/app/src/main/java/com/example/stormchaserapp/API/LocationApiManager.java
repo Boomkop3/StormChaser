@@ -64,36 +64,17 @@ public class LocationApiManager {
                             Manifest.permission.ACCESS_COARSE_LOCATION
                     },
                     // Google's documentation is kinda bad
-                    5 // f this
+                    (int) Math.random() * 1337 // f this
             );
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
-    public void getBackgroundLocPermission(Activity activity) {
-        if (!checkBackgroundLocPermission()) {
-            ActivityCompat.requestPermissions(activity, new String[] {
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            }, 6);
-        }
-    }
     public boolean checkLocationPermission(){
         return ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED;
     }
-
-    public boolean checkBackgroundLocPermission() {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     public void startListeningUserLocation(LocationListener locationListener) {
         Criteria locationCriteria = new Criteria();

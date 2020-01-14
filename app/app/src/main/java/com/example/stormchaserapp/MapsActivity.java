@@ -17,6 +17,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.SyncStateContract;
@@ -29,6 +30,7 @@ import com.example.stormchaserapp.API.NearbyCitiesApiManager;
 import com.example.stormchaserapp.API.OnNewNearbyCity;
 import com.example.stormchaserapp.Models.LocalWeather;
 import com.example.stormchaserapp.Storage.VolatileStorage;
+import com.example.stormchaserapp.lib.Toaster;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
@@ -55,10 +57,7 @@ public class MapsActivity
     private GoogleMap map;
     private LocationApiManager locationApiManager;
     private Context context;
-    private GeofencingClient client;
-    private ArrayList<Geofence> geofences;
-    private PendingIntent geofencePendingIntent;
-    private String reqID;
+    private ArrayList<LocalWeather> cities;
 
     public void startSettings() {
         Intent intent = new Intent(this, SettingsFragment.class);
@@ -68,15 +67,12 @@ public class MapsActivity
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        cities = new ArrayList<>();
         super.onCreate(savedInstanceState);
         this.context = getApplicationContext();
         this.locationApiManager = LocationApiManager.with(context);
         setContentView(R.layout.activity_maps);
         ImageButton settings = findViewById(R.id.buttonSettings);
-        client = LocationServices.getGeofencingClient(this);
-        geofences = new ArrayList<>();
-        reqID = "IDI";
-        locationApiManager.getBackgroundLocPermission(this);
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,30 +108,12 @@ public class MapsActivity
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == 5) {
+        if (requestCode == requestCode) {
             if (locationApiManager.checkLocationPermission()) {
                 locationApiManager.startListeningUserLocation(this);
             } else {
                 // Otherwise, just ask again
                 locationApiManager.getLocationPermission(this);
-            }
-        }
-        if (requestCode == 6) {
-            if (locationApiManager.checkBackgroundLocPermission()) {
-
-                client.addGeofences(getGeofencingRequest(), getGeofencePendingIntent()).addOnSuccessListener(this, new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-
-                    }
-                }).addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
-            } else {
-                locationApiManager.getBackgroundLocPermission(this);
             }
         }
     }
@@ -158,29 +136,13 @@ public class MapsActivity
             circleOptions.center(city.getLocation());
             circleOptions.radius(2500.0f);
             map.addCircle(circleOptions);
-            this.reqID += "I";
-            geofences.add(new Geofence.Builder().setRequestId(reqID).setCircularRegion(city.getLocation().latitude, city.getLocation().longitude, 2500.0f).setExpirationDuration(50000).setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());
+            cities.add(city);
         }
         else {
 
         }
     }
 
-    private GeofencingRequest getGeofencingRequest() {
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofences(geofences);
-        return builder.build();
-    }
-
-    private PendingIntent getGeofencePendingIntent() {
-        if (geofencePendingIntent != null) {
-            return geofencePendingIntent;
-        }
-        Intent intent = new Intent(this, GeofenceBroadcastReciever.class);
-        geofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        return geofencePendingIntent;
-    }
 
     private void handleLocationUpdate(Location location){
         LatLng locationPoint = new LatLng(
@@ -217,6 +179,14 @@ public class MapsActivity
                 e.printStackTrace();
             }
         }
+        for (LocalWeather city : cities) {
+            Location citylocation = new Location(LocationManager.GPS_PROVIDER);
+            citylocation.setLatitude(city.getLocation().latitude);
+            citylocation.setLongitude(city.getLocation().longitude);
+            if (location.distanceTo(citylocation) < 2500) {
+                Toaster.with(this).toastShort(getResources().getString(R.string.toastRadSuc));
+            }
+        }
     }
 
     // fusedLocation
@@ -238,6 +208,7 @@ public class MapsActivity
     @Override
     public void onLocationChanged(Location location) {
         handleLocationUpdate(location);
+        System.out.println(location);
     }
 
     @Override
