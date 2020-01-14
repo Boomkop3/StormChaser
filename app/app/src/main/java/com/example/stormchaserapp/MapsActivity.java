@@ -24,6 +24,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.UnsupportedEncodingException;
@@ -38,28 +39,6 @@ public class MapsActivity
     private LocationApiManager locationApiManager;
     private Context context;
     private boolean gotWeatherInfo;
-
-    private void setLocale(String lang){
-        Locale locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Configuration config = getBaseContext().getResources().getConfiguration();
-        config.setLocale(locale);
-        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
-
-        Resources resources = getBaseContext().getResources();
-        Configuration configuration = resources.getConfiguration();
-        configuration.locale = new Locale(lang);
-        getBaseContext().getApplicationContext().createConfigurationContext(configuration);
-
-        Configuration cfg = new Configuration();
-        if (!TextUtils.isEmpty(lang)) {
-            cfg.locale = new Locale(lang);
-        }
-        else {
-            cfg.locale = Locale.getDefault();
-        }
-        this.getResources().updateConfiguration(cfg, null);
-    }
 
     public void startSettings() {
         Intent intent = new Intent(this, SettingsFragment.class);
@@ -139,13 +118,18 @@ public class MapsActivity
                                 new OnNewNearbyCity() {
                                     @Override
                                     public void newCity(LocalWeather city) {
+                                        // ToDo: print a rainy cloud icon or something
+                                        // Todo: generate directional geofences
+                                        //  to check if the user walks in the right direction
+                                        if (city.isRaining()){
+                                            MarkerOptions rainMarker = new MarkerOptions();
+                                            rainMarker.position(city.getLocation());
+                                            rainMarker.title(city.getWeatherDescription());
+                                            map.addMarker(rainMarker);
+                                        }
+                                        else {
 
-                                        // ToDo: print city on map if rainy
-
-
-
-
-
+                                        }
                                     }
                                 });
             } catch (UnsupportedEncodingException e) {
@@ -189,8 +173,4 @@ public class MapsActivity
     public void onProviderDisabled(String s) {
         // wtvr
     }
-}
-
-interface onCoordinateResponse {
-    void onResponse(LatLng location);
 }

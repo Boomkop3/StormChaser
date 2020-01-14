@@ -16,15 +16,16 @@ public class DataManager {
         return instance;
     }
 
-    public String getLanguage(){
+    public Language getLanguage(){
         String langIfEmpty = Locale.getDefault().getLanguage();
         if (langIfEmpty != "nl" | langIfEmpty != "en"){
             langIfEmpty = "en";
         }
-        return context.getSharedPreferences("lang", Context.MODE_PRIVATE).getString("lang", langIfEmpty);
+        String langString = context.getSharedPreferences("lang", Context.MODE_PRIVATE).getString("lang", langIfEmpty);
+        return Language.valueOf(langString);
     }
 
-    public void setLanguage(String language){
-        context.getSharedPreferences("lang", Context.MODE_PRIVATE).edit().putString("lang", language).commit();
+    public void setLanguage(Language language){
+        context.getSharedPreferences("lang", Context.MODE_PRIVATE).edit().putString("lang", language.name()).commit();
     }
 }

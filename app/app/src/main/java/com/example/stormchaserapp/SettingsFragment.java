@@ -16,6 +16,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
 
+import com.example.stormchaserapp.Storage.DataManager;
+import com.example.stormchaserapp.Storage.Language;
+
 public class SettingsFragment extends AppCompatActivity {
 
     private RadioButton NL;
@@ -36,14 +39,23 @@ public class SettingsFragment extends AppCompatActivity {
 
         NL = findViewById(R.id.radioButtonNL);
         EN = findViewById(R.id.radioButtonEN);
+
+        if (DataManager.with(getApplicationContext()).getLanguage() == Language.nl){
+            NL.toggle();
+        } else {
+            EN.toggle();
+        }
+
         NL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DataManager.with(getApplicationContext()).setLanguage(Language.nl);
             }
         });
         EN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DataManager.with(getApplicationContext()).setLanguage(Language.en);
             }
         });
     }
