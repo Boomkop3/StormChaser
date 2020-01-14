@@ -122,7 +122,7 @@ public class MapsActivity
                 client.addGeofences(getGeofencingRequest(), getGeofencePendingIntent()).addOnSuccessListener(this, new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        System.out.println("a");
+
                     }
                 }).addOnFailureListener(this, new OnFailureListener() {
                     @Override
