@@ -1,7 +1,7 @@
 package com.example.stormchaserapp.API;
 
-import com.example.stormchaserapp.Models.City;
+import com.example.stormchaserapp.Models.LocalWeather;
 
 public interface OnNewNearbyCity{
-    void newCity(City city);
+    void newCity(LocalWeather city);
 }

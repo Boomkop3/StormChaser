@@ -2,22 +2,23 @@ package com.example.stormchaserapp.Models;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class City {
+public class LocalWeather {
     private LatLng location;
+    private String cityName;
     private boolean raining;
-    private String name;
     private String weatherHeader;
     private String weatherDescription;
-    public City(
+
+    public LocalWeather(
             LatLng location,
+            String cityName,
             boolean raining,
-            String name,
             String weatherHeader,
             String weatherDescription
         ) {
         this.location = location;
+        this.cityName = cityName;
         this.raining = raining;
-        this.name = name;
         this.weatherHeader = weatherHeader;
         this.weatherDescription = weatherDescription;
     }
@@ -26,12 +27,12 @@ public class City {
         return location;
     }
 
-    public boolean isRaining() {
-        return raining;
+    public String getCityName() {
+        return cityName;
     }
 
-    public String getName() {
-        return name;
+    public boolean isRaining() {
+        return raining;
     }
 
     public String getWeatherHeader() {

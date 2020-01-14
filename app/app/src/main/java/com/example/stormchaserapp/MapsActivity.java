@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.example.stormchaserapp.API.LocationApiManager;
+import com.example.stormchaserapp.API.NearbyCitiesApiManager;
+import com.example.stormchaserapp.API.OnNewNearbyCity;
+import com.example.stormchaserapp.Models.LocalWeather;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -19,6 +22,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import java.io.UnsupportedEncodingException;
 
 public class MapsActivity
         extends     FragmentActivity
@@ -28,6 +33,7 @@ public class MapsActivity
     private GoogleMap map;
     private LocationApiManager locationApiManager;
     private Context context;
+    private boolean gotWeatherInfo;
 
     public void startSettings() {
         Intent intent = new Intent(this, SettingsFragment.class);
@@ -37,6 +43,7 @@ public class MapsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.gotWeatherInfo = false;
         this.context = getApplicationContext();
         this.locationApiManager = LocationApiManager.with(context);
         setContentView(R.layout.activity_maps);
@@ -96,6 +103,29 @@ public class MapsActivity
                         10
                 )
         );
+        if (!this.gotWeatherInfo){
+            this.gotWeatherInfo = true;
+            try {
+                NearbyCitiesApiManager
+                        .with(this)
+                        .getNearbyCities(
+                                locationPoint,
+                                new OnNewNearbyCity() {
+                                    @Override
+                                    public void newCity(LocalWeather city) {
+
+                                        // ToDo: print city on map if rainy
+
+
+
+
+
+                                    }
+                                });
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // fusedLocation
