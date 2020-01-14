@@ -12,4 +12,5 @@
     <string name="location_required_dialog_title">Locatie vereist</string>
     <string name="location_required_dialog_message">Zet je gps aan</string>
     <string name="developers">Ontwikkelaars</string>
+    <string name="toastRadSuc">Je bent in (of binnen 2,5 km van) een regengebied</string>
 </resources>

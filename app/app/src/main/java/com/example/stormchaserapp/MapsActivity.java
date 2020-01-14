@@ -1,15 +1,23 @@
 package com.example.stormchaserapp;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageButton;
@@ -19,6 +27,10 @@ import com.example.stormchaserapp.API.NearbyCitiesApiManager;
 import com.example.stormchaserapp.API.OnNewNearbyCity;
 import com.example.stormchaserapp.Models.LocalWeather;
 import com.example.stormchaserapp.Storage.VolatileStorage;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,9 +38,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class MapsActivity
@@ -39,6 +53,10 @@ public class MapsActivity
     private GoogleMap map;
     private LocationApiManager locationApiManager;
     private Context context;
+    private GeofencingClient client;
+    private ArrayList<Geofence> geofences;
+    private PendingIntent geofencePendingIntent;
+    private String reqID;
 
     public void startSettings() {
         Intent intent = new Intent(this, SettingsFragment.class);
@@ -52,6 +70,10 @@ public class MapsActivity
         this.locationApiManager = LocationApiManager.with(context);
         setContentView(R.layout.activity_maps);
         ImageButton settings = findViewById(R.id.buttonSettings);
+        client = LocationServices.getGeofencingClient(this);
+        geofences = new ArrayList<>();
+        reqID = "IDI";
+        locationApiManager.getBackgroundLocPermission(this);
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,12 +108,30 @@ public class MapsActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == requestCode) {
+        if (requestCode == 5) {
             if (locationApiManager.checkLocationPermission()) {
                 locationApiManager.startListeningUserLocation(this);
             } else {
                 // Otherwise, just ask again
                 locationApiManager.getLocationPermission(this);
+            }
+        }
+        if (requestCode == 6) {
+            if (locationApiManager.checkBackgroundLocPermission()) {
+
+                client.addGeofences(getGeofencingRequest(), getGeofencePendingIntent()).addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        System.out.println("a");
+                    }
+                }).addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            } else {
+                locationApiManager.getBackgroundLocPermission(this);
             }
         }
     }
@@ -110,10 +150,32 @@ public class MapsActivity
             rainMarker.position(city.getLocation());
             rainMarker.title(city.getWeatherDescription());
             map.addMarker(rainMarker);
+            CircleOptions circleOptions = new CircleOptions();
+            circleOptions.center(city.getLocation());
+            circleOptions.radius(2500.0f);
+            map.addCircle(circleOptions);
+            this.reqID += "I";
+            geofences.add(new Geofence.Builder().setRequestId(reqID).setCircularRegion(city.getLocation().latitude, city.getLocation().longitude, 2500.0f).setExpirationDuration(50000).setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT).build());
         }
         else {
 
         }
+    }
+
+    private GeofencingRequest getGeofencingRequest() {
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(geofences);
+        return builder.build();
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        if (geofencePendingIntent != null) {
+            return geofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceBroadcastReciever.class);
+        geofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return geofencePendingIntent;
     }
 
     private void handleLocationUpdate(Location location){
