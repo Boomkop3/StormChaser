@@ -61,7 +61,8 @@ public class LocationApiManager {
                     activity,
                     new String[]{
                             Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_BACKGROUND_LOCATION
                     },
                     // Google's documentation is kinda bad
                     (int) Math.random() * 1337 // f this
