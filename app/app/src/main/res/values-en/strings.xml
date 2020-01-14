@@ -9,4 +9,6 @@
     <string name="language">language:</string>
     <string name="nl">Dutch</string>
     <string name="en">English</string>
+    <string name="location_required_dialog_title">Location required</string>
+    <string name="location_required_dialog_message">Please turn on location services</string>
 </resources>

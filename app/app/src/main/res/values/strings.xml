@@ -9,4 +9,6 @@
     <string name="nl">Nederlands</string>
     <string name="en">Engels</string>
     <string name="title_activity_maps" translatable="false">Map</string>
+    <string name="location_required_dialog_title">Locatie vereist</string>
+    <string name="location_required_dialog_message">Zet je gps aan</string>
 </resources>
