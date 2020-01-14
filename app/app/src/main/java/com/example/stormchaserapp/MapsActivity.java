@@ -5,9 +5,12 @@ import androidx.fragment.app.FragmentActivity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -24,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 
 public class MapsActivity
         extends     FragmentActivity
@@ -34,6 +38,28 @@ public class MapsActivity
     private LocationApiManager locationApiManager;
     private Context context;
     private boolean gotWeatherInfo;
+
+    private void setLocale(String lang){
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = getBaseContext().getResources().getConfiguration();
+        config.setLocale(locale);
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+
+        Resources resources = getBaseContext().getResources();
+        Configuration configuration = resources.getConfiguration();
+        configuration.locale = new Locale(lang);
+        getBaseContext().getApplicationContext().createConfigurationContext(configuration);
+
+        Configuration cfg = new Configuration();
+        if (!TextUtils.isEmpty(lang)) {
+            cfg.locale = new Locale(lang);
+        }
+        else {
+            cfg.locale = Locale.getDefault();
+        }
+        this.getResources().updateConfiguration(cfg, null);
+    }
 
     public void startSettings() {
         Intent intent = new Intent(this, SettingsFragment.class);
