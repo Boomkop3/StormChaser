@@ -1,1 +1,1 @@
-Not much effort went into this
+Very little effort went into this
